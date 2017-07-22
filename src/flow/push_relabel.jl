@@ -12,12 +12,27 @@ function push_relabel end
     residual_graph::::IsDirected,               # the input graph
     source::Integer,                       # the source vertex
     target::Integer,                       # the target vertex
-    capacity_matrix::AbstractMatrix    # edge flow capacities
-    )
+    capacity_matrix::AbstractMatrix{T}    # edge flow capacities
+) where T
+    flow_matrix = zeros(T, n, n)
+    push_relabel!(flow_matrix,
+                  residual_graph,
+                  source,
+                  target,
+                  capacity_matrix)
+end
+
+function push_relabel! end
+@traitfn function push_relabel!(
+    flow_matrix::Matrix{T},
+    residual_graph::::IsDirected,               # the input graph
+    source::Integer,                       # the source vertex
+    target::Integer,                       # the target vertex
+    capacity_matrix::AbstractMatrix{T}    # edge flow capacities
+    ) where T
 
     n = nv(residual_graph)
-    T = eltype(capacity_matrix)
-    flow_matrix = zeros(T, n, n)
+    # T = eltype(capacity_matrix)
 
     height = zeros(Int, n)
     height[source] = n
