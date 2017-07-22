@@ -12,10 +12,22 @@ function push_relabel end
     residual_graph::::IsDirected,               # the input graph
     source::Integer,                       # the source vertex
     target::Integer,                       # the target vertex
-    capacity_matrix::AbstractMatrix{T}    # edge flow capacities
-) where T
-    flow_matrix = zeros(T, n, n)
+    capacity_matrix::AbstractMatrix    # edge flow capacities
+)
+    n = nv(residual_graph)
+    T = eltype(capacity_matrix)
+
+    flow_matrix = Array{T}(n, n)
+    height = Array{Int}(n)
+    count = Array{Int}(2*n+1)
+    excess = Array{T}(n)
+    active = Array{Bool}(n)
+
     push_relabel!(flow_matrix,
+                  height,
+                  count,
+                  excess,
+                  active,
                   residual_graph,
                   source,
                   target,
@@ -24,27 +36,32 @@ end
 
 function push_relabel! end
 @traitfn function push_relabel!(
-    flow_matrix::Matrix{T},
+    flow_matrix::Matrix,
+    height::Vector{Int},
+    count::Vector{Int},
+    excess::Vector,
+    active::Vector{Bool},
     residual_graph::::IsDirected,               # the input graph
     source::Integer,                       # the source vertex
     target::Integer,                       # the target vertex
-    capacity_matrix::AbstractMatrix{T}    # edge flow capacities
-    ) where T
+    capacity_matrix::AbstractMatrix    # edge flow capacities
+    )
 
     n = nv(residual_graph)
-    # T = eltype(capacity_matrix)
 
-    height = zeros(Int, n)
+    fill!(flow_matrix, 0)
+
+    fill!(height, 0)
     height[source] = n
 
-    count = zeros(Int, 2*n+1)
+    fill!(count, 0)
     count[0+1] = n-1
     count[n+1] = 1
 
-    excess = zeros(T, n)
-    excess[source] = typemax(T)
+    fill!(excess, 0)
+    excess[source] = typemax(eltype(excess))
 
-    active = falses(n)
+    fill!(active, false)
     active[source] = true
     active[target] = true
 
