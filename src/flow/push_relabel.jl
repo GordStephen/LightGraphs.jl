@@ -79,7 +79,7 @@ function push_relabel! end
         discharge!(residual_graph, v, capacity_matrix, flow_matrix, excess, height, active, count, Q)
     end
 
-    return sum([flow_matrix[v,target] for v in in_neighbors(residual_graph, target) ]), flow_matrix
+    return NaN, flow_matrix
 end
 
 """
